@@ -38,31 +38,13 @@ class AuthApiController extends Controller
         }
         // Pegar Users
         $user = auth()->user();
-        $permissions = collect([]);
-
-        $roles = DB::table('model_has_roles')->where('model_id', $user->id)
-        ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
-        ->select('roles.*')
-        ->get();
-
-
-        foreach($roles as $role):
-            $permissions_role = DB::table('role_has_permissions')->where('role_id', $role->id)
-            ->join('permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
-            ->select('permissions.*')
-            ->pluck('permissions.name');
-
-            $permissions = $permissions->concat(collect($permissions_role));
-        endforeach;
-        $permissions = $this->criarArrayUnico($permissions);
 
         $this->dados_login = [
             'token' => $token,
             'user' => $user,
-            'roles' => $roles,
-            'permissions' => $permissions,
             'status' => 'success'
         ];
+        return $this->dados_login;
         return $this->respondWithToken($this->dados_login);
 
     }
@@ -134,9 +116,18 @@ class AuthApiController extends Controller
      */
     public function logout()
     {
-        auth()->logout();
-
-        return response()->json(['message' => 'Successfully logged out']);
+        try 
+        {
+            // Invalida o token
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return response()->json(['message' => 'Successfully logged out'], 200);
+        } 
+        catch (\Exception $e) 
+        {
+            return response()->json(['error' => 'Failed to logout, please try again.'], 500);
+        }
+        //auth()->logout();
+        //return response()->json(['message' => 'Successfully logged out']);
     }
 
     /**

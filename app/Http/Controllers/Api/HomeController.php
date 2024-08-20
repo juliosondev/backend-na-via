@@ -4,9 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Modelos\Product;
+
 
 class HomeController extends Controller
 {
+    public function __construct()
+    {
+        $this->produtos = new Product();
+        //$this->middleware('auth:api', ['except' => ['login', 'register']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -81,5 +88,11 @@ class HomeController extends Controller
     public function destroy($id)
     {
         //
+    }
+    public function mostRequestedProduts()
+    {
+        $produtos = $this->produtos->getProductForHome();
+
+        return $produtos;
     }
 }

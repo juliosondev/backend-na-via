@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Modelos;
+namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Pais extends Model
+class Product extends Model
 {
     //
 }
