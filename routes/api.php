@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\UserApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
@@ -20,14 +21,22 @@ Route::group([
     Route::post('me', 'Api\Auth\AuthApiController@me');
 
     // USUÁRIOS
-    Route::get('usuarios', 'Api\UserApiController@index');
-    Route::post('usuarios', 'Api\UserApiController@store');
-    Route::get('usuarios/{id}', 'Api\UserApiController@show');
-    Route::put('usuarios/{id}', 'Api\UserApiController@update');
+    Route::get('users', 'Api\UserApiController@index');
+    Route::post('addUser', 'Api\UserApiController@signup');
+    Route::get('user/{id}', 'Api\UserApiController@show');
+    Route::post('deleteUser/{id}', 'Api\UserApiController@destroy');
+    Route::get('resendEmail/{id}', 'Api\UserApiController@resend');
+
+
+    // Route::put('usuarios/{id}', 'Api\UserApiController@update');
     Route::delete('usuarios/apagar/{id}', 'Api\UserApiController@destroy');
 
     //Products
     Route::get('homeproduct', 'Api\HomeController@mostRequestedProduts');
+    Route::get('groups', 'Api\HomeController@groups');
+    Route::get('anuncios', 'Api\HomeController@anuncios');
+
+
+    Route::get('email_verify', [UserApiController::class, 'verifyEmail']);
+
 });
-
-

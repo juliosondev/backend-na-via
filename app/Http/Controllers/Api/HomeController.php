@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Modelos\Product;
-
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -19,9 +19,18 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function groups()
     {
-        //
+        $groups = DB::table('grupos')->get();
+
+        return response()->json($groups);
+    }
+
+    public function anuncios()
+    {
+        $anuncios = DB::table('anuncios')->get();
+
+        return response()->json($anuncios);
     }
 
     /**
@@ -91,8 +100,13 @@ class HomeController extends Controller
     }
     public function mostRequestedProduts()
     {
-        $produtos = $this->produtos->getProductForHome();
 
-        return $produtos;
+        $produtos = DB::table('produtos')
+        ->leftJoin('precos', 'produtos.id', '=', 'precos.produto_id')
+        ->select('produtos.*', 'precos.valor') // Select the fields you need
+        ->get();
+
+        return response()->json($produtos);
+
     }
 }

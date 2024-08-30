@@ -1,15 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\Auth\AuthApiController;
 use App\Http\Controllers\Api\UserApiController;
-use Laravel\Socialite\Facades\Socialite;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-
-
-
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,5 +18,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('email_verify', [UserApiController::class, 'verifyEmail']);
-
 
