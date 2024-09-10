@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\UserApiController;
+use App\Http\Controllers\RequestsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
@@ -38,5 +39,12 @@ Route::group([
 
 
     Route::get('email_verify', [UserApiController::class, 'verifyEmail']);
+
+    Route::get('paymentMethods', [RequestsController::class, 'paymentMethods']);
+
+    Route::post('addRequest', [RequestsController::class, 'addRequest']);
+    Route::get('myRequests/{id}', [RequestsController::class, 'myRequests']);
+
+
 
 });
