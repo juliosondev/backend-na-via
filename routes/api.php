@@ -44,6 +44,17 @@ Route::group([
 
     Route::post('addRequest', [RequestsController::class, 'addRequest']);
     Route::get('myRequests/{id}', [RequestsController::class, 'myRequests']);
+    Route::get('availableRequests', [RequestsController::class, 'availableRequests']);
+
+    Route::post('editRequest/{id}/{field}', [RequestsController::class, 'editRequest']);
+
+    Route::get('acceptedRequests/{id}', [RequestsController::class, 'acceptedRequests']);
+
+    Route::get('request/{id}', [RequestsController::class, 'request']);
+
+
+
+
 
 
 
