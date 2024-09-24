@@ -26,6 +26,8 @@ Route::group([
     Route::post('addUser', 'Api\UserApiController@signup');
     Route::get('user/{id}', 'Api\UserApiController@show');
     Route::post('deleteUser/{id}', 'Api\UserApiController@destroy');
+    Route::post('editUser/{field}/{id}', 'Api\UserApiController@editUser');
+
     Route::get('resendEmail/{id}', 'Api\UserApiController@resend');
 
 

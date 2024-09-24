@@ -54,43 +54,7 @@ class UserApiController extends Controller
      */
     public function signup(Request $request)
     {
-        // $validator = Validator::make($request->all(), [
-        //     'papel' => 'required',
-        //     'nome' => 'required|min:2',
-        //     'email' => 'required|email|unique:users,email',
-        //  ], $messages = [
-        //     'required' => 'Este campo é obrigatório',
-        //     'email.unique' => 'Este email já esta em uso',
-        //     'email' => 'Formato de email incorrecto',
-        //     'min' => 'No mínimo dois(2) caracteres para este campo',
-        //  ]);
 
-        //  if ($validator->fails()):
-        //     return response()->json([
-        //             "message" => $validator->errors(),
-        //             "status" => 422
-        //     ], 422);
-        //  else:
-
-            // $data_time = new \DateTime();
-            // $usuario = DB::table('users')->insert([
-            //     'name' => $request->nome,
-            //     'password' => Hash::make('123'),
-            //     'email' => $request->email,
-            //     'status' => 'activo',
-            //     'created_at' => now(),
-            //     'updated_at' => now(),
-            // ]);
-            // $user_dados = DB::table('users_dados')->insert([
-
-            // ]);
-            // foreach($request->papel as $key => $item):
-            //     $papel_usuario = DB::table('model_has_roles')->insert([
-            //         'role_id' => $item,
-            //         'model_type' => 'App\User',
-            //         'model_id' => $usuario
-            //     ]);
-            // endforeach;
             if (DB::table('users')
             ->where('users.email', $request->email)->exists()){
                 return response()->json([
@@ -98,27 +62,6 @@ class UserApiController extends Controller
                         "status" => 422
                 ], 422);
             }else {
-        //         data_time = new DateTime;
-        // $user = DB::table('users')->insertGetId([
-        //     'level' => 0,
-        //     'email' => 'root@gmail.com',
-        //     'password' => Hash::make('123456'),
-        //     'status' => 'activo',
-        //     'created_at' => $data_time,
-        //     'updated_at' => $data_time,
-        // ]);
-
-        // $dados_user = DB::table('users_dados')->insert([
-        //     'user_id' => $user,
-        //     'nome' => 'AVK JS',
-        //     'genero' => 'm',
-        //     'data_nascimento' => null,
-        //     'tel' => null,
-        //     'morada' => null,
-        //     'foto' => null,
-        //     'created_at' => $data_time,
-        //     'updated_at' => $data_time,
-        // ]);
 
         $user_id = DB::table('users')->insertGetId([
             'level' => 3,
@@ -139,6 +82,7 @@ class UserApiController extends Controller
             'tel' => $request->input('telefone'),
             'morada' => null,
             'foto' => null,
+            'localizacao'=> null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -346,9 +290,18 @@ class UserApiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function editUser(Request $request, $field, $id)
     {
-        //
+        if ($field == 'local'){
+            DB::table('users_dados')
+                ->where('user_id', $id)
+                ->update(['localizacao' => $request->input('localizacao'), 'updated_at' => now()]);
+        }
+        $updatedUser = DB::table('users_dados')
+        ->where('user_id', $id)
+        ->first();
+
+    return response()->json($updatedUser);
     }
 
     /**
