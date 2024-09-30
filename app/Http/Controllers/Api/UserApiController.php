@@ -89,7 +89,10 @@ class UserApiController extends Controller
 
         $token = JWTAuth::fromUser($user);
         $currentSite = $request->getSchemeAndHttpHost();
-        $absoluteUrl = $currentSite . '/api/v1/email_verify?token=' . $token;
+        // $absoluteUrl = $currentSite . '/api/v1/email_verify?token=' . $token;
+        //fd
+        $absoluteUrl = $currentSite . '/na-via/backend-na-via/public/api/v1/email_verify?token=' . $token;
+
 
         $emailData = [
             'name' => $request->nome,
@@ -188,6 +191,7 @@ class UserApiController extends Controller
         $token = JWTAuth::fromUser($user);
         $currentSite = $request->getSchemeAndHttpHost();
         // $absoluteUrl = $currentSite . '/api/v1/email_verify?token=' . $token;
+        //fd
         $absoluteUrl = $currentSite . '/na-via/backend-na-via/public/api/v1/email_verify?token=' . $token;
 
         $emailData = [
