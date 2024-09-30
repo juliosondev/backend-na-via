@@ -187,7 +187,9 @@ class UserApiController extends Controller
 
         $token = JWTAuth::fromUser($user);
         $currentSite = $request->getSchemeAndHttpHost();
-        $absoluteUrl = $currentSite . 'na-via/backend-na-via/public/api/v1/email_verify?token=' . $token;
+        // $absoluteUrl = $currentSite . '/api/v1/email_verify?token=' . $token;
+        $absoluteUrl = $currentSite . '/na-via/backend-na-via/public/api/v1/email_verify?token=' . $token;
+
         $emailData = [
             'name' => $user1->nome,
             'email' => $user->email,
@@ -245,8 +247,8 @@ class UserApiController extends Controller
             $user->status = 'activo';
             $user->save();
 
-            return view('emails.verified', ['user' => $user1]);
-            return response()->json('Email enviado');
+             return view('emails.verified', ['user' => $user1]);
+             return response()->json('Email enviado');
 
          } catch (Exception $e) {
              if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
