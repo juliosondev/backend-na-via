@@ -187,7 +187,7 @@ class UserApiController extends Controller
         ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
         ->select('users.*', 'users_dados.*')
         ->first();
-
+        
         $token = JWTAuth::fromUser($user);
         $currentSite = $request->getSchemeAndHttpHost();
         // $absoluteUrl = $currentSite . '/api/v1/email_verify?token=' . $token;
