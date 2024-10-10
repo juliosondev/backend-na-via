@@ -177,4 +177,20 @@ class HomeController extends Controller
         return response()->json($produtos);
 
     }
+    public function products(Request $request)
+    {
+        $q = $request->query('q');
+
+
+        $produtos = DB::table('produtos')
+        ->leftJoin('precos', 'produtos.id', '=', 'precos.produto_id')
+        ->select('produtos.*', 'precos.valor')
+        ->when($q, function ($query) use ($q) {
+            return $query->where('produtos.nome_produto', 'like', '%'.$q.'%');
+        })
+        ->get();
+
+        return response()->json($produtos);
+
+    }
 }

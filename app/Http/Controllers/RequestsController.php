@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Pedido;
+use App\User;
+use ExponentPhpSDK\Exceptions\ExpoException;
+use ExponentPhpSDK\Expo;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -101,6 +105,41 @@ class RequestsController extends Controller
             $pedido->info = $request->input('info');
             $pedido->save();
             return response()->json($pedido);
+        }
+    }
+
+    public function testNotification(Request $request, $id)
+    {
+        $user = User::find($id);
+        $token = $user->expo_push_token;
+        if (!$token){
+            return response()->json(['error' => 'Você precisa habilitar permissões para receber notificações'], 400);
+
+        }
+        try {
+            // Create a new instance of the Expo SDK
+            $expo = Expo::normalSetup();
+
+            // You can create a custom key for your tokens, or use the userId as the key
+            $recipient = $request->token;
+
+            // Add the recipient (Expo Push Token)
+            $expo->subscribe($recipient, $recipient);
+
+            // Notification data
+            $notificationData = [
+                'title' => $request->title,
+                'body' => $request->body,
+                'sound' => 'default', // Optional
+                'data' => ['extraData' => 'Some extra data here'] // Optional
+            ];
+
+            // Send the notification
+            $expo->notify([$recipient], $notificationData);
+
+            return response()->json(['success' => 'Notification sent successfully!']);
+        } catch (ExpoException $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 }

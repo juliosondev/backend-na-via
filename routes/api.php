@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\UserApiController;
 use App\Http\Controllers\RequestsController;
 use Illuminate\Http\Request;
@@ -53,6 +54,11 @@ Route::group([
     Route::get('acceptedRequests/{id}', [RequestsController::class, 'acceptedRequests']);
 
     Route::get('request/{id}', [RequestsController::class, 'request']);
+    Route::post('testNotification/{id}', [RequestsController::class, 'testNotification']);
+    Route::post('updateExpoPushToken', [UserApiController::class, 'updateExpoPushToken']);
+
+    Route::get('products', [HomeController::class, 'products']);
+
 
 
 

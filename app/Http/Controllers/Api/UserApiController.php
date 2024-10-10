@@ -187,7 +187,7 @@ class UserApiController extends Controller
         ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
         ->select('users.*', 'users_dados.*')
         ->first();
-        
+
         $token = JWTAuth::fromUser($user);
         $currentSite = $request->getSchemeAndHttpHost();
         // $absoluteUrl = $currentSite . '/api/v1/email_verify?token=' . $token;
@@ -389,6 +389,15 @@ class UserApiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+    public function updateExpoPushToken(Request $request){
+        $user = User::find($request->id);
+        $user->expo_push_token = $request->token;
+        $user->save();
+
+        return response()->json($user);
+    }
+
     public function destroy($id)
     {
         User::find($id)->delete();
