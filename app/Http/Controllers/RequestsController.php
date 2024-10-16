@@ -142,4 +142,17 @@ class RequestsController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+    public function addProductReview(Request $request){
+        $req = DB::table('comentarios_produtos')->insert([
+            'user_id' => $request->input('user_id'),
+            'produto_id' => $request->input('product_id'),
+            'mensagem' => $request->input('mensagem'),
+            'info'=> json_encode($request->input('info')),
+            'status'=> 'activo',
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+        return response()->json($req);
+    }
+
 }

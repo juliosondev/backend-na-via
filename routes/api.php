@@ -58,6 +58,8 @@ Route::group([
     Route::post('updateExpoPushToken', [UserApiController::class, 'updateExpoPushToken']);
 
     Route::get('products', [HomeController::class, 'products']);
+    Route::post('addProductReview', [RequestsController::class, 'addProductReview']);
+
 
 
 
