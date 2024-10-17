@@ -59,6 +59,10 @@ Route::group([
 
     Route::get('products', [HomeController::class, 'products']);
     Route::post('addProductReview', [RequestsController::class, 'addProductReview']);
+    Route::get('myReviews/{id}', [RequestsController::class, 'myReviews']);
+    Route::post('editMyReview/{id}', [RequestsController::class, 'editMyReview']);
+
+
 
 
 

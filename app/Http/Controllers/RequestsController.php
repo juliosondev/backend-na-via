@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\ComentarioProduto;
 use App\Http\Controllers\Controller;
 use App\Pedido;
 use App\User;
@@ -153,6 +154,22 @@ class RequestsController extends Controller
             'updated_at' => now()
         ]);
         return response()->json($req);
+    }
+    public function myReviews(Request $request, $id)
+    {
+
+        $comments = ComentarioProduto::where('user_id', $id)
+                    ->get();
+
+        return response()->json($comments);
+    }
+    public function editMyReview(Request $request, $id)
+    {
+
+        $comentario = ComentarioProduto::find($id);
+        $comentario->update($request->all());
+
+        return response()->json($comentario);
     }
 
 }
