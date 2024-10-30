@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\ComentarioProduto;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Modelos\Product;
@@ -191,6 +192,31 @@ class HomeController extends Controller
         ->get();
 
         return response()->json($produtos);
+
+    }
+    public function product(Request $request, $id)
+    {
+
+
+        $produto = DB::table('produtos')
+        ->leftJoin('precos', 'produtos.id', '=', 'precos.produto_id')
+        ->select('produtos.*', 'precos.valor')
+        ->where('produtos.id', $id)
+        ->first();
+        $comments = ComentarioProduto::where('produto_id', $id)
+        ->get();
+        $comments = $comments->map(function ($comment) {
+            $comment->user = DB::table('users')
+            ->where('users.id', $comment->user_id)
+            ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+            ->select('users.*', 'users_dados.*')
+            ->first();
+            return $comment;
+        });
+        $produto->reviews = $comments;
+
+
+        return response()->json($produto);
 
     }
 }

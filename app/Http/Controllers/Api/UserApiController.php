@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\ComentarioProduto;
 use App\Http\Controllers\Controller;
 use App\Mail\VerifyEmail;
 use Illuminate\Http\Request;
@@ -274,12 +275,19 @@ class UserApiController extends Controller
             ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
             ->select('users.*', 'users_dados.*')
             ->first();
+            $comments = ComentarioProduto::where('user_id', $id)
+            ->get();
+            $user->myReviews = $comments;
         }else {
             $user = DB::table('users')
             ->where('users.id', $id)
             ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
             ->select('users.*', 'users_dados.*')
             ->first();
+
+            $comments = ComentarioProduto::where('user_id', $id)
+            ->get();
+            $user->myReviews = $comments;
         }
 
 
@@ -406,5 +414,42 @@ class UserApiController extends Controller
             "status" => 201
         ], 201);
 
+    }
+    public function addFavorite(Request $request)
+    {
+
+        $favorite = DB::table('favorites')->insert([
+            'user_id' => $request->input('user_id'),
+            'produto_id' => $request->input('produto_id'),
+            'info' => json_encode($request->input('info')),
+            'status'=> 'activo',
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+    }
+
+    public function deleteFavorite(Request $request, $id)
+    {
+
+        $deleted = DB::table('favorites')
+        ->where('favorites.id', $id)
+        ->delete();
+        if ($deleted) {
+            return response()->json(['message' => 'Favorite deleted successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'Favorite not found.'], 404);
+        }
+    }
+    public function favorites(Request $request){
+        $query = $request->query('q');
+        if ($query){
+            $favorites = DB::table('favorites')
+            ->where('favorites.user_id', $query)
+            ->get();
+        }else {
+            $favorites = DB::table('favorites')
+            ->get();
+        }
+        return response()->json($favorites);
     }
 }

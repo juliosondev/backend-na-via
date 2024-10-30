@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
+use App\ComentarioProduto;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
@@ -42,7 +43,8 @@ class AuthApiController extends Controller
         $this->dados_login = [
             'token' => $token,
             'user' => $user,
-            'status' => 'success'
+            'myReviews' => ComentarioProduto::where('user_id', $user->id)
+            ->get(),
         ];
         return $this->dados_login;
         return $this->respondWithToken($this->dados_login);
@@ -116,13 +118,13 @@ class AuthApiController extends Controller
      */
     public function logout()
     {
-        try 
+        try
         {
             // Invalida o token
             JWTAuth::invalidate(JWTAuth::getToken());
             return response()->json(['message' => 'Successfully logged out'], 200);
-        } 
-        catch (\Exception $e) 
+        }
+        catch (\Exception $e)
         {
             return response()->json(['error' => 'Failed to logout, please try again.'], 500);
         }

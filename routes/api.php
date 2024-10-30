@@ -61,15 +61,9 @@ Route::group([
     Route::post('addProductReview', [RequestsController::class, 'addProductReview']);
     Route::get('myReviews/{id}', [RequestsController::class, 'myReviews']);
     Route::post('editMyReview/{id}', [RequestsController::class, 'editMyReview']);
-
-
-
-
-
-
-
-
-
-
+    Route::get('product/{id}', [HomeController::class, 'product']);
+    Route::post('addFavorite', [UserApiController::class, 'addFavorite']);
+    Route::post('deleteFavorite/{id}', [UserApiController::class, 'deleteFavorite']);
+    Route::get('favorites', [UserApiController::class, 'favorites']);
 
 });
