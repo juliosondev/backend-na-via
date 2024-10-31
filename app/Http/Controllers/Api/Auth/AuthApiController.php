@@ -43,8 +43,9 @@ class AuthApiController extends Controller
         $this->dados_login = [
             'token' => $token,
             'user' => $user,
-            'myReviews' => ComentarioProduto::where('user_id', $user->id)
-            ->get(),
+            'myReviews' => ComentarioProduto::where('user_id', $user->id),
+            'favorites' => DB::table('favorites')->where('user_id', $user->id)->get(),
+
         ];
         return $this->dados_login;
         return $this->respondWithToken($this->dados_login);

@@ -174,6 +174,12 @@ class HomeController extends Controller
         ->leftJoin('precos', 'produtos.id', '=', 'precos.produto_id')
         ->select('produtos.*', 'precos.valor') // Select the fields you need
         ->get();
+        $produtos = $produtos->map(function ($item){
+            $comments = ComentarioProduto::where('produto_id', $item->id)
+            ->get();
+            $item->comments = $comments;
+            return $item;
+        });
 
         return response()->json($produtos);
 
@@ -190,6 +196,12 @@ class HomeController extends Controller
             return $query->where('produtos.nome_produto', 'like', '%'.$q.'%');
         })
         ->get();
+        $produtos = $produtos->map(function ($item){
+            $comments = ComentarioProduto::where('produto_id', $item->id)
+            ->get();
+            $item->comments = $comments;
+            return $item;
+        });
 
         return response()->json($produtos);
 

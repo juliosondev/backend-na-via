@@ -278,6 +278,8 @@ class UserApiController extends Controller
             $comments = ComentarioProduto::where('user_id', $id)
             ->get();
             $user->myReviews = $comments;
+            $favorites = DB::table('favorites')->where('user_id', $id)->get();
+            $user->favorites = $favorites;
         }else {
             $user = DB::table('users')
             ->where('users.id', $id)
@@ -288,6 +290,8 @@ class UserApiController extends Controller
             $comments = ComentarioProduto::where('user_id', $id)
             ->get();
             $user->myReviews = $comments;
+            $favorites = DB::table('favorites')->where('user_id', $id)->get();
+            $user->favorites = $favorites;
         }
 
 
@@ -446,9 +450,38 @@ class UserApiController extends Controller
             $favorites = DB::table('favorites')
             ->where('favorites.user_id', $query)
             ->get();
+
+            $favorites = $favorites->map(function ($item){
+                $produto = DB::table('produtos')
+                ->where('produtos.id', $item->produto_id)
+                ->leftJoin('precos', 'produtos.id', '=', 'precos.produto_id')
+                ->select('produtos.*', 'precos.valor')
+                ->first();
+                $comments = ComentarioProduto::where('produto_id', $item->produto_id)
+                ->get();
+                $produto->comments = $comments;
+                $item->product = $produto;
+
+                return $item;
+            });
+
         }else {
             $favorites = DB::table('favorites')
             ->get();
+            $favorites = $favorites->map(function ($item){
+                $produto = DB::table('produtos')
+                ->where('produtos.id', $item->produto_id)
+                ->leftJoin('precos', 'produtos.id', '=', 'precos.produto_id')
+                ->select('produtos.*', 'precos.valor')
+                ->first();
+
+                $comments = ComentarioProduto::where('produto_id', $item->produto_id)
+                ->get();
+                $produto->comments = $comments;
+                $item->product = $produto;
+
+                return $item;
+            });
         }
         return response()->json($favorites);
     }
