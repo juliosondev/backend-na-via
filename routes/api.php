@@ -25,6 +25,9 @@ Route::group([
     // USUÁRIOS
     Route::get('users', 'Api\UserApiController@index');
     Route::post('addUser', 'Api\UserApiController@signup');
+    // emailExists
+    Route::get('emailExists', 'Api\UserApiController@emailExists');
+
     Route::get('user/{id}', 'Api\UserApiController@show');
     Route::post('deleteUser/{id}', 'Api\UserApiController@destroy');
     Route::post('editUser/{field}/{id}', 'Api\UserApiController@editUser');
@@ -42,6 +45,8 @@ Route::group([
 
 
     Route::get('email_verify', [UserApiController::class, 'verifyEmail']);
+    Route::get('email_verify2', [UserApiController::class, 'verifyEmail2']);
+
 
     Route::get('paymentMethods', [RequestsController::class, 'paymentMethods']);
 

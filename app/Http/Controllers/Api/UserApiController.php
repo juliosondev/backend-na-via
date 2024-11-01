@@ -265,6 +265,49 @@ class UserApiController extends Controller
              }
          }
      }
+     public function verifyEmail2(Request $request)
+     {
+        $token = $request->query('token');
+        $newName = $request->query('newName');
+        $newPhone = $request->query('newPhone');
+        $newEmail = $request->query('newEmail');
+
+
+        try {
+            $payload = JWTAuth::setToken($token)->getPayload();
+
+            $userId = $payload->get('sub');
+
+            $user = User::find($userId);
+            $user1 = DB::table('users')
+            ->where('users.id', $userId)
+            ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+            ->select('users.*', 'users_dados.*')
+            ->first();
+
+            DB::table('users_dados')
+            ->where('user_id', $userId)
+            ->update(['tel' => $newPhone, 'nome' => $newName, 'updated_at' => now()]);
+            $user = User::find($userId);
+            $user->email =$newEmail;
+            $user->save();
+
+
+
+
+            return view('emails.verified2', ['user' => $user1]);
+            return response()->json('Email enviado');
+
+        } catch (Exception $e) {
+            if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
+                return response()->json(['error' => 'Activation Expired'], 400);
+            } elseif ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
+                return response()->json(['error' => 'Invalid Token'], 400);
+            } else {
+                return response()->json(['error' => 'Error processing token'], 400);
+            }
+        }
+    }
 
     public function show(Request $request, $id)
     {
@@ -308,18 +351,78 @@ class UserApiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function emailExists(Request $request){
+        $query = $request->query('q');
+        if (DB::table('users')
+            ->where('users.email', $query)->exists()){
+                return response()->json([
+                        "message" => 'Email em uso, escolha um outro email.',
+                        "status" => 422
+                ], 422);
+        }else {
+            return response()->json('success');
+        }
+    }
     public function editUser(Request $request, $field, $id)
     {
         if ($field == 'local'){
             DB::table('users_dados')
                 ->where('user_id', $id)
                 ->update(['localizacao' => $request->input('localizacao'), 'updated_at' => now()]);
-        }
-        $updatedUser = DB::table('users_dados')
-        ->where('user_id', $id)
-        ->first();
 
-    return response()->json($updatedUser);
+            $updatedUser = DB::table('users_dados')
+            ->where('user_id', $id)
+            ->first();
+
+            return response()->json($updatedUser);
+        }else if ($field == 'noEmail'){
+            DB::table('users_dados')
+                ->where('user_id', $id)
+                ->update(['tel' => $request->input('phone'), 'nome' => $request->input('fullname'), 'updated_at' => now()]);
+
+            $updatedUser = DB::table('users_dados')
+            ->where('user_id', $id)
+            ->first();
+
+            return response()->json($updatedUser);
+        }else if ($field == 'email'){
+            $user = User::find($id);
+            $user1 = DB::table('users')
+            ->where('users.id', $id)
+            ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+            ->select('users.*', 'users_dados.*')
+            ->first();
+
+            $token = JWTAuth::fromUser($user);
+            $currentSite = $request->getSchemeAndHttpHost();
+            $absoluteUrl = $currentSite . '/api/v1/email_verify2?token=' . $token.'&newName='.$request->input('fullname').'&newPhone='.$request->input('phone').'&newEmail='. $request->input('email');
+            //fd
+            // $absoluteUrl = $currentSite . '/na-via/backend-na-via/public/api/v1/email_verify?token=' . $token;
+
+            $emailData = [
+                'name' => $user1->nome,
+                'email' => $user->email,
+                'verificationUrl' => $absoluteUrl,
+                'newName' => $request->input('fullname'),
+                'newPhone' => $request->input('phone'),
+                'verify2'=> true
+
+            ];
+
+
+            Mail::to($request->input('email'))->send(new VerifyEmail($emailData));
+
+            return response()->json([
+                "message" => "Novo email enviado com sucesso",
+                "data" => $user,
+                "status" => 201
+            ], 201);
+        }else if ($field == 'password'){
+            $user = User::find($id);
+            $user->password = Hash::make($request->input('password'));
+            $user->save();
+        }
+
     }
 
     /**

@@ -30,8 +30,14 @@ class VerifyEmail extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.verify_email')
+        if ($this->data['verify2']){
+            return $this->view('emails.verify_email2')
+                    ->subject('Verifica o seu novo email')
+                    ->with('data', $this->data);
+        }else {
+            return $this->view('emails.verify_email')
                     ->subject('Verifica o seu email')
                     ->with('data', $this->data);
+        }
     }
 }
