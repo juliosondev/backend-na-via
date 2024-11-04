@@ -308,6 +308,45 @@ class UserApiController extends Controller
             }
         }
     }
+    public function verifyEmail3(Request $request)
+    {
+       $token = $request->query('token');
+
+
+
+       try {
+           $payload = JWTAuth::setToken($token)->getPayload();
+
+           $userId = $payload->get('sub');
+
+           $user = User::find($userId);
+           $user1 = DB::table('users')
+           ->where('users.id', $userId)
+           ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+           ->select('users.*', 'users_dados.*')
+           ->first();
+
+
+           $user = User::find($userId);
+           $user->is_verified = true;
+           $user->save();
+
+
+
+
+           return view('emails.verified3', ['user' => $user1]);
+           return response()->json('Email enviado');
+
+       } catch (Exception $e) {
+           if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException) {
+               return response()->json(['error' => 'Activation Expired'], 400);
+           } elseif ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException) {
+               return response()->json(['error' => 'Invalid Token'], 400);
+           } else {
+               return response()->json(['error' => 'Error processing token'], 400);
+           }
+       }
+   }
 
     public function show(Request $request, $id)
     {
@@ -420,7 +459,44 @@ class UserApiController extends Controller
         }else if ($field == 'password'){
             $user = User::find($id);
             $user->password = Hash::make($request->input('password'));
+            $user->is_verified = false;
             $user->save();
+        }else if ($field == 'forgot'){
+            $user = User::find($id);
+            $user1 = DB::table('users')
+            ->where('users.id', $id)
+            ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+            ->select('users.*', 'users_dados.*')
+            ->first();
+            $user->is_verified = false;
+            $user->save();
+            $user = User::find($id);
+
+            $token = JWTAuth::fromUser($user);
+            $currentSite = $request->getSchemeAndHttpHost();
+            $absoluteUrl = $currentSite . '/api/v1/email_verify3?token=' . $token;
+            //fd
+            // $absoluteUrl = $currentSite . '/na-via/backend-na-via/public/api/v1/email_verify?token=' . $token;
+
+            $emailData = [
+                'name' => $user1->nome,
+                'email' => $user->email,
+                'verificationUrl' => $absoluteUrl,
+                'newName' => $request->input('fullname'),
+                'newPhone' => $request->input('phone'),
+                'verify3'=> true,
+
+            ];
+
+
+
+            Mail::to($user->email)->send(new VerifyEmail($emailData));
+
+            return response()->json([
+                "message" => "Novo email enviado com sucesso",
+                "data" => $user,
+                "status" => 201
+            ], 201);
         }
 
     }

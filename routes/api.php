@@ -46,6 +46,8 @@ Route::group([
 
     Route::get('email_verify', [UserApiController::class, 'verifyEmail']);
     Route::get('email_verify2', [UserApiController::class, 'verifyEmail2']);
+    Route::get('email_verify3', [UserApiController::class, 'verifyEmail3']);
+
 
 
     Route::get('paymentMethods', [RequestsController::class, 'paymentMethods']);
