@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserApiController extends Controller
@@ -396,6 +397,11 @@ class UserApiController extends Controller
             ->where('users.email', $query)->exists()){
                 return response()->json([
                         "message" => 'Email em uso, escolha um outro email.',
+                        'user' => DB::table('users')
+                        ->where('users.email', $query)
+                        ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+                        ->select('users.*', 'users_dados.*')
+                        ->first(),
                         "status" => 422
                 ], 422);
         }else {
@@ -663,5 +669,42 @@ class UserApiController extends Controller
             });
         }
         return response()->json($favorites);
+    }
+
+    public function uploadPic(Request $request, $id){
+
+        $user = DB::table('users_dados')
+        ->where('user_id', $id)
+        ->first();
+        if($request->image_data){
+            $imageData = base64_decode($request->input('image_data'));
+            $filename = 'image_'.time(). '.'.$request->input('ext');
+            $imagePath = "images/" . $filename;
+
+
+
+            Storage::disk('public')->put($imagePath, $imageData);
+
+            if ($user->foto) {
+                Storage::disk('public')->delete('images/'.$user->foto);
+            }
+            DB::table('users_dados')
+            ->where('user_id', $id)
+            ->update(['foto' => $filename, 'updated_at' => now()]);
+
+            $user = DB::table('users')
+            ->where('users.id', $id)
+            ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+            ->select('users.*', 'users_dados.*')
+            ->first();
+
+            $comments = ComentarioProduto::where('user_id', $id)
+            ->get();
+            $user->myReviews = $comments;
+            $favorites = DB::table('favorites')->where('user_id', $id)->get();
+            $user->favorites = $favorites;
+            return response()->json($user);
+        }
+
     }
 }

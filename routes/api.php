@@ -72,5 +72,9 @@ Route::group([
     Route::post('addFavorite', [UserApiController::class, 'addFavorite']);
     Route::post('deleteFavorite/{id}', [UserApiController::class, 'deleteFavorite']);
     Route::get('favorites', [UserApiController::class, 'favorites']);
+    Route::get('username', [UserApiController::class, 'username']);
+    Route::post('uploadPic/{id}', [UserApiController::class, 'uploadPic']);
+
+
 
 });
