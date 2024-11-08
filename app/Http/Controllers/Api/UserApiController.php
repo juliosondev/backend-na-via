@@ -644,6 +644,28 @@ class UserApiController extends Controller
                 ->first();
                 $comments = ComentarioProduto::where('produto_id', $item->produto_id)
                 ->get();
+                //
+                $fornecedor = DB::table('users')
+                    ->where('users.id', $produto->fornecedor_id)
+                    ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+                    ->select('users.*', 'users_dados.*')
+                    ->get();
+                    $fornecedor = $fornecedor->map(function ($it) use ($produto){
+                        $products = DB::table('produtos')
+                        ->where('fornecedor_id', $produto->fornecedor_id)
+                        ->get();
+                        $products = $products->map(function ($prod) {
+                            $comments = ComentarioProduto::where('produto_id', $prod->id)
+                            ->get();
+                            return $comments->map(function ($it){
+                                return json_decode($it->info)->rating;
+                            });
+                        });
+
+                        $it->reviews = $products;
+                        return $it;
+                    })->first();
+                $produto->fornecedor = $fornecedor;
                 $produto->comments = $comments;
                 $item->product = $produto;
 
@@ -662,6 +684,27 @@ class UserApiController extends Controller
 
                 $comments = ComentarioProduto::where('produto_id', $item->produto_id)
                 ->get();
+                $fornecedor = DB::table('users')
+                    ->where('users.id', $produto->fornecedor_id)
+                    ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+                    ->select('users.*', 'users_dados.*')
+                    ->get();
+                    $fornecedor = $fornecedor->map(function ($it) use ($produto){
+                        $products = DB::table('produtos')
+                        ->where('fornecedor_id', $produto->fornecedor_id)
+                        ->get();
+                        $products = $products->map(function ($prod) {
+                            $comments = ComentarioProduto::where('produto_id', $prod->id)
+                            ->get();
+                            return $comments->map(function ($it){
+                                return json_decode($it->info)->rating;
+                            });
+                        });
+
+                        $it->reviews = $products;
+                        return $it;
+                    })->first();
+                $produto->fornecedor = $fornecedor;
                 $produto->comments = $comments;
                 $item->product = $produto;
 

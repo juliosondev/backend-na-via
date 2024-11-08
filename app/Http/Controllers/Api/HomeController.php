@@ -28,7 +28,7 @@ class HomeController extends Controller
         ->leftJoin('subcategorias', 'categorias.id', '=', 'subcategorias.categoria_id')
         ->leftJoin('produtos', 'subcategorias.id', '=', 'produtos.subcategoria_id')
         ->leftJoin('precos', 'produtos.id', '=', 'precos.produto_id')
-        ->select('grupos.id as grupo_id', 'grupos.*', 'categorias.*', 'categorias.status as categoria_status', 'categorias.id as categoria_id', 'subcategorias.status as subcategoria_status', 'subcategorias.imagem as subcategoria_imagem', 'subcategorias.categoria_id as subcategoria_categoria_id', 'subcategorias.id as subcategoria_id', 'subcategorias.nome_subcategoria as nome_subcategoria', 'produtos.imagem as produto_imagem', 'produtos.nome_produto as nome_produto', 'produtos.descricao as produto_descricao', 'produtos.status as produto_status', 'produtos.id as produto_id', 'produtos.created_at as produto_created_at', 'precos.valor as produto_valor')
+        ->select('grupos.id as grupo_id', 'grupos.*', 'categorias.*', 'categorias.status as categoria_status', 'categorias.id as categoria_id', 'subcategorias.status as subcategoria_status', 'subcategorias.imagem as subcategoria_imagem', 'subcategorias.categoria_id as subcategoria_categoria_id', 'subcategorias.id as subcategoria_id', 'subcategorias.nome_subcategoria as nome_subcategoria', 'produtos.imagem as produto_imagem', 'produtos.nome_produto as nome_produto', 'produtos.descricao as produto_descricao', 'produtos.status as produto_status', 'produtos.id as produto_id', 'produtos.fornecedor_id as produto_fornecedor_id', 'produtos.created_at as produto_created_at', 'precos.valor as produto_valor')
         ->get()
         ->groupBy('grupo_id')
         ->map(function ($group) {
@@ -42,6 +42,26 @@ class HomeController extends Controller
                 $subcategoriaData = $subcategoriaGroup->first();
 
                 $produtos = $subcategoriaGroup->map(function ($item) {
+                    $fornecedor = DB::table('users')
+                    ->where('users.id', $item->produto_fornecedor_id)
+                    ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+                    ->select('users.*', 'users_dados.*')
+                    ->get();
+                    $fornecedor = $fornecedor->map(function ($it) use ($item){
+                        $products = DB::table('produtos')
+                        ->where('fornecedor_id', $item->produto_fornecedor_id)
+                        ->get();
+                        $products = $products->map(function ($prod) {
+                            $comments = ComentarioProduto::where('produto_id', $prod->id)
+                            ->get();
+                            return $comments->map(function ($it){
+                                return json_decode($it->info)->rating;
+                            });
+                        });
+
+                        $it->reviews = $products;
+                        return $it;
+                    })->first();
                     return [
                         'id' => $item->produto_id,
                         'nome_produto' => $item->nome_produto,
@@ -49,7 +69,8 @@ class HomeController extends Controller
                         'imagem' => $item->produto_imagem,
                         'valor' => $item->produto_valor,
                         'descricao' => $item->produto_descricao,
-                        'created_at' => $item->produto_created_at
+                        'created_at' => $item->produto_created_at,
+                        'fornecedor' => $fornecedor
 
                     ];
                 })->filter(function ($item) {
@@ -178,6 +199,27 @@ class HomeController extends Controller
             $comments = ComentarioProduto::where('produto_id', $item->id)
             ->get();
             $item->comments = $comments;
+            $fornecedor = DB::table('users')
+                    ->where('users.id', $item->fornecedor_id)
+                    ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+                    ->select('users.*', 'users_dados.*')
+                    ->get();
+                    $fornecedor = $fornecedor->map(function ($it) use ($item){
+                        $products = DB::table('produtos')
+                        ->where('fornecedor_id', $item->fornecedor_id)
+                        ->get();
+                        $products = $products->map(function ($prod) {
+                            $comments = ComentarioProduto::where('produto_id', $prod->id)
+                            ->get();
+                            return $comments->map(function ($it){
+                                return json_decode($it->info)->rating;
+                            });
+                        });
+
+                        $it->reviews = $products;
+                        return $it;
+                    })->first();
+            $item->fornecedor = $fornecedor;
             return $item;
         });
 
@@ -200,6 +242,27 @@ class HomeController extends Controller
             $comments = ComentarioProduto::where('produto_id', $item->id)
             ->get();
             $item->comments = $comments;
+            $fornecedor = DB::table('users')
+                    ->where('users.id', $item->fornecedor_id)
+                    ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+                    ->select('users.*', 'users_dados.*')
+                    ->get();
+                    $fornecedor = $fornecedor->map(function ($it) use ($item){
+                        $products = DB::table('produtos')
+                        ->where('fornecedor_id', $item->fornecedor_id)
+                        ->get();
+                        $products = $products->map(function ($prod) {
+                            $comments = ComentarioProduto::where('produto_id', $prod->id)
+                            ->get();
+                            return $comments->map(function ($it){
+                                return json_decode($it->info)->rating;
+                            });
+                        });
+
+                        $it->reviews = $products;
+                        return $it;
+                    })->first();
+                $item->fornecedor = $fornecedor;
             return $item;
         });
 
@@ -225,6 +288,27 @@ class HomeController extends Controller
             ->first();
             return $comment;
         });
+        $fornecedor = DB::table('users')
+                    ->where('users.id', $produto->fornecedor_id)
+                    ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+                    ->select('users.*', 'users_dados.*')
+                    ->get();
+                    $fornecedor = $fornecedor->map(function ($it) use ($produto){
+                        $products = DB::table('produtos')
+                        ->where('fornecedor_id', $produto->fornecedor_id)
+                        ->get();
+                        $products = $products->map(function ($prod) {
+                            $comments = ComentarioProduto::where('produto_id', $prod->id)
+                            ->get();
+                            return $comments->map(function ($it){
+                                return json_decode($it->info)->rating;
+                            });
+                        });
+
+                        $it->reviews = $products;
+                        return $it;
+                    })->first();
+        $produto->fornecedor = $fornecedor;
         $produto->reviews = $comments;
 
 

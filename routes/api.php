@@ -74,7 +74,6 @@ Route::group([
     Route::get('favorites', [UserApiController::class, 'favorites']);
     Route::get('username', [UserApiController::class, 'username']);
     Route::post('uploadPic/{id}', [UserApiController::class, 'uploadPic']);
-
-
+    Route::get('stats/{id}', [RequestsController::class, 'stats']);
 
 });

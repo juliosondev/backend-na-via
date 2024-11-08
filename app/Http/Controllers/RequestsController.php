@@ -171,5 +171,69 @@ class RequestsController extends Controller
 
         return response()->json($comentario);
     }
+    public function stats(Request $request, $id){
+        $products = DB::table('produtos')
+        ->where('fornecedor_id', $id)
+        ->leftJoin('precos', 'produtos.id', '=', 'precos.produto_id')
+        ->select('produtos.*', 'precos.valor')
+        ->get();
+        $ratings = $products->map(function ($prod) {
+            $comments = ComentarioProduto::where('produto_id', $prod->id)
+            ->get();
+            return $comments->map(function ($it){
+                return json_decode($it->info)->rating;
+            });
+        });
+        $reviews = $products->map(function ($prod) {
+            $comments = ComentarioProduto::where('produto_id', $prod->id)
+            ->get();
+            $comments = $comments->map(function ($comment) {
+                $comment->user = DB::table('users')
+                ->where('users.id', $comment->user_id)
+                ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+                ->select('users.*', 'users_dados.*')
+                ->first();
+                return $comment;
+            });
+            return $comments;
+        });
+
+
+
+        $products = $products->map(function ($item){
+            $comments = ComentarioProduto::where('produto_id', $item->id)
+            ->get();
+            //
+            $fornecedor = DB::table('users')
+                ->where('users.id', $item->fornecedor_id)
+                ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+                ->select('users.*', 'users_dados.*')
+                ->get();
+                $fornecedor = $fornecedor->map(function ($it) use ($item){
+                    $products = DB::table('produtos')
+                    ->where('fornecedor_id', $item->fornecedor_id)
+                    ->get();
+                    $products = $products->map(function ($prod) {
+                        $comments = ComentarioProduto::where('produto_id', $prod->id)
+                        ->get();
+                        return $comments->map(function ($it){
+                            return json_decode($it->info)->rating;
+                        });
+                    });
+
+                    $it->reviews = $products;
+                    return $it;
+                })->first();
+            $item->fornecedor = $fornecedor;
+            $item->comments = $comments;
+
+            return $item;
+        });
+        return response()->json([
+            'ratings'=>$ratings,
+            'reviews' => $reviews,
+            'products' => $products
+        ]);
+    }
 
 }
