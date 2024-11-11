@@ -229,10 +229,53 @@ class RequestsController extends Controller
 
             return $item;
         });
+
+        $requests = DB::table('pedidos')->get();
+        // $requests->filter(function ($item){
+        //     $cart = json_decode($item->info, true)['cart'];
+        //     $cart->map(function ($prod){
+        //         $currProd = DB::table('produtos')
+        //         ->where('id', $prod['id'])
+        //         ->first();
+
+        //         if ($currProd->fornecedor_id == $id){
+        //             return true;
+        //         }else {
+        //             return false;
+        //         }
+        //     });
+
+        // });
+        $filteredRequests = $requests->filter(function ($item) use ($id){
+            $cart = json_decode($item->info, true)['cart'] ?? [];
+            $productIds = collect($cart)->pluck('id');
+
+            return DB::table('produtos')
+                ->whereIn('id', $productIds)
+                ->where('fornecedor_id', $id)
+                ->exists();
+        })->map(function ($item) use ($id){
+            $cart = json_decode($item->info, true)['cart'] ?? [];
+            $clientInfo = DB::table('users')
+            ->where('users.id', $item->user_cliente_id)
+            ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+            ->select('users.*', 'users_dados.*')
+            ->first();
+            $filteredCart = collect($cart)->filter(function ($product) use ($id) {
+                return DB::table('produtos')
+                    ->where('id', $product['id'])
+                    ->where('fornecedor_id', $id)
+                    ->exists();
+            });
+            $item->info = json_encode(['cart' => $filteredCart->values()->all(), 'delivered' => json_decode($item->info, true)['delivered'], 'user'=> $clientInfo]);
+            return $item;
+
+        });
         return response()->json([
             'ratings'=>$ratings,
             'reviews' => $reviews,
-            'products' => $products
+            'products' => $products,
+            'requests' => $filteredRequests->values()->all()
         ]);
     }
 
