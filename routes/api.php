@@ -75,5 +75,7 @@ Route::group([
     Route::get('username', [UserApiController::class, 'username']);
     Route::post('uploadPic/{id}', [UserApiController::class, 'uploadPic']);
     Route::get('stats/{id}', [RequestsController::class, 'stats']);
+    Route::get('myProducts/{id}', [RequestsController::class, 'myProducts']);
+
 
 });

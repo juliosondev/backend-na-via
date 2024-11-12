@@ -46,6 +46,34 @@ class RequestsController extends Controller
     ->first();
 
     $pedidos = $pedidos->map(function ($pedido) use ($clientInfo) {
+        $info = json_decode($pedido->info, true);
+        $cart = $info['cart'];
+        $cart = collect($cart)->map(function ($item){
+            $prod = DB::table('produtos')
+            ->where('id', $item['id'])
+            ->first();
+            $fornecedor = DB::table('users')
+                ->where('users.id', $prod->fornecedor_id)
+                ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+                ->select('users.*', 'users_dados.*')
+                ->first();
+            $products = DB::table('produtos')
+            ->where('fornecedor_id', $prod->fornecedor_id)
+            ->get();
+            $products = $products->map(function ($prod) {
+                $comments = ComentarioProduto::where('produto_id', $prod->id)
+                ->get();
+                return $comments->map(function ($it){
+                    return json_decode($it->info)->rating;
+                });
+            });
+
+            $fornecedor->reviews = $products;
+            $item['fornecedor'] = $fornecedor;
+            return $item;
+        });
+        $info['cart'] = $cart;
+        $pedido->info = json_encode($info);
         $pedido->clientInfo = $clientInfo;
         return $pedido;
     });
@@ -87,6 +115,34 @@ class RequestsController extends Controller
     public function request($id)
     {
         $pedido = Pedido::findOrFail($id);
+        $info = json_decode($pedido->info, true);
+        $cart = $info['cart'];
+        $cart = collect($cart)->map(function ($item){
+            $prod = DB::table('produtos')
+            ->where('id', $item['id'])
+            ->first();
+            $fornecedor = DB::table('users')
+                ->where('users.id', $prod->fornecedor_id)
+                ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+                ->select('users.*', 'users_dados.*')
+                ->first();
+            $products = DB::table('produtos')
+            ->where('fornecedor_id', $prod->fornecedor_id)
+            ->get();
+            $products = $products->map(function ($prod) {
+                $comments = ComentarioProduto::where('produto_id', $prod->id)
+                ->get();
+                return $comments->map(function ($it){
+                    return json_decode($it->info)->rating;
+                });
+            });
+
+            $fornecedor->reviews = $products;
+            $item['fornecedor'] = $fornecedor;
+            return $item;
+        });
+        $info['cart'] = $cart;
+        $pedido->info = json_encode($info);
         return response()->json($pedido);
     }
 
@@ -160,6 +216,21 @@ class RequestsController extends Controller
 
         $comments = ComentarioProduto::where('user_id', $id)
                     ->get();
+        $comments = $comments->map(function ($item) {
+            $info = json_decode($item->info, true);
+            $prod = DB::table('produtos')
+                ->where('id', $info['produto']['id'])
+                ->first();
+            $fornecedor = DB::table('users')
+                ->where('users.id', $prod->fornecedor_id)
+                ->join('users_dados', 'users.id', '=', 'users_dados.user_id')
+                ->select('users.*', 'users_dados.*')
+                ->first();
+            $info['produto']['fornecedor'] = $fornecedor;
+            $item->info = json_encode($info);
+
+            return $item;
+        });
 
         return response()->json($comments);
     }
@@ -277,6 +348,16 @@ class RequestsController extends Controller
             'products' => $products,
             'requests' => $filteredRequests->values()->all()
         ]);
+    }
+    public function myProducts (Request $request, $id){
+        $produtos = DB::table('produtos')
+        ->where('fornecedor_id', $id)
+        ->leftJoin('precos', 'produtos.id', '=', 'precos.produto_id')
+        ->select('produtos.*', 'precos.valor')
+        ->get();
+
+        return response()->json($produtos);
+
     }
 
 }
