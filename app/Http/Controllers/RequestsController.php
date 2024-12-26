@@ -47,7 +47,8 @@ class RequestsController extends Controller
 
     $pedidos = $pedidos->map(function ($pedido) use ($clientInfo) {
         $info = json_decode($pedido->info, true);
-        $cart = $info['cart'];
+        if (isset($info['cart'])) {
+            $cart = $info['cart'];
         $cart = collect($cart)->map(function ($item){
             $prod = DB::table('produtos')
             ->where('id', $item['id'])
@@ -71,8 +72,10 @@ class RequestsController extends Controller
             $fornecedor->reviews = $products;
             $item['fornecedor'] = $fornecedor;
             return $item;
-        });
-        $info['cart'] = $cart;
+            });
+
+            $info['cart'] = $cart;
+        }
         $pedido->info = json_encode($info);
         $pedido->clientInfo = $clientInfo;
         return $pedido;
@@ -116,7 +119,8 @@ class RequestsController extends Controller
     {
         $pedido = Pedido::findOrFail($id);
         $info = json_decode($pedido->info, true);
-        $cart = $info['cart'];
+        if (isset($info['cart'])) {
+            $cart = $info['cart'];
         $cart = collect($cart)->map(function ($item){
             $prod = DB::table('produtos')
             ->where('id', $item['id'])
@@ -141,7 +145,9 @@ class RequestsController extends Controller
             $item['fornecedor'] = $fornecedor;
             return $item;
         });
-        $info['cart'] = $cart;
+
+            $info['cart'] = $cart;
+        }
         $pedido->info = json_encode($info);
         return response()->json($pedido);
     }
