@@ -171,6 +171,7 @@ class RequestsController extends Controller
         }
     }
 
+
     public function testNotification(Request $request, $id)
     {
         $user = User::find($id);
@@ -184,15 +185,15 @@ class RequestsController extends Controller
             $expo = Expo::normalSetup();
 
             // You can create a custom key for your tokens, or use the userId as the key
-            $recipient = $request->token;
+            $recipient = $user->expo_push_token;
 
             // Add the recipient (Expo Push Token)
             $expo->subscribe($recipient, $recipient);
 
             // Notification data
             $notificationData = [
-                'title' => $request->title,
-                'body' => $request->body,
+                'title' => 'O autocarro chegou!1',
+                'body' => "O autocarro C",
                 'sound' => 'default', // Optional
                 'data' => ['extraData' => 'Some extra data here'] // Optional
             ];
