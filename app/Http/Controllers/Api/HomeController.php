@@ -20,6 +20,30 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function allGroups(){
+        $groups = DB::table('grupos')->where('status', 'activo')->get();
+
+        $groups = collect($groups)->map(function ($group){
+            $group->categorias = DB::table('categorias')
+                ->where('grupo_id', $group->id)
+                ->where('status', 'activo')
+                ->get();
+
+            $group->categorias = collect($group->categorias)->map(function ($categoria){
+                $categoria->subcategorias = DB::table('subcategorias')
+                    ->where('categoria_id', $categoria->id)
+                    ->where('status', 'activo')
+                    ->get();
+                return $categoria;
+            })->values();
+
+            return $group;
+        })->values();
+
+        return $groups;
+    }
+
+
     public function groups()
     {
         // $groups = DB::table('grupos')->get();

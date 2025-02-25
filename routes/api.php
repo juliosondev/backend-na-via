@@ -80,6 +80,9 @@ Route::group([
 
     Route::get('recolha_entrega_infos', [RecolhaEntregaInfoController::class, 'all']);
     Route::get('taxas_servicos', [RecolhaEntregaInfoController::class, 'allTaxas']);
+    Route::get('allGroups', [HomeController::class, 'allGroups']);
+
+
 
 
 
