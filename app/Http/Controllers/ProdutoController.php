@@ -15,8 +15,8 @@ class ProdutoController extends Controller
     public function addProduto(Request $request){
 
         $list = array_map(function ($item) {
-            $imageData = base64_decode($item);
-            $filename = 'image_'.time(). Str::random(10). '.png';
+            $imageData = base64_decode($item['base64']);
+            $filename = 'image_'.time(). Str::random(10). '.'.$item['ext'];
             $imagePath = "images/" . $filename;
             Storage::disk('public')->put($imagePath, $imageData);
             return $filename;
@@ -25,7 +25,7 @@ class ProdutoController extends Controller
         $produto = DB::table('produtos')->insertGetId([
             'fornecedor_id' => $request->fornecedor_id,
             'subcategoria_id' => $request->subcategoria_id,
-            'nome_produto' => $request->nome,
+            'nome_produto' => $request->nome_produto,
             'imagem' => !empty($list) ? $list[0] : null,
             'imagens' => json_encode($list),
             'quantidade' => (float)$request->quantidade,

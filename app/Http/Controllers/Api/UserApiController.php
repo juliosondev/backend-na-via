@@ -724,8 +724,6 @@ class UserApiController extends Controller
             $filename = 'image_'.time(). '.'.$request->input('ext');
             $imagePath = "images/" . $filename;
 
-
-
             Storage::disk('public')->put($imagePath, $imageData);
 
             if ($user->foto) {
@@ -750,4 +748,5 @@ class UserApiController extends Controller
         }
 
     }
+    
 }

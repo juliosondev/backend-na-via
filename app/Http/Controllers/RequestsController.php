@@ -370,7 +370,7 @@ class RequestsController extends Controller
 
     }
 
-    public function show($id)
+    public function packageLocation($id)
     {
         $pacote = User::find($id);
         return $pacote;
@@ -393,7 +393,7 @@ class RequestsController extends Controller
         $totalDistanceAndDuration = $this->calculateTotalDistanceAndDuration($directions);
 
         $noti = $pacote->noti;
-        $noti['insidePerimeter'] = $noti['insidePerimeter'] ?? false;
+        // $noti['insidePerimeter'] = $noti['insidePerimeter'] ?? false;
 
         // if ($duration <= 60 && $duration > 50 && !$noti['notified1']) {
         //     $direccao = $autocarro->direccao == 0 ? $autocarro->rota->partida : $autocarro->rota->chegada;
@@ -455,7 +455,7 @@ class RequestsController extends Controller
         // }
 
 
-        $pacote->noti = $noti;
+        // $pacote->noti = $noti;
 
         $pacote->localizacao = $request->localizacao;
 

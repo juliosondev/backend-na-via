@@ -63,6 +63,12 @@ Route::group([
     Route::get('acceptedRequests/{id}', [RequestsController::class, 'acceptedRequests']);
 
     Route::get('request/{id}', [RequestsController::class, 'request']);
+
+    Route::get('request/updateLocation', [RequestsController::class, 'updateLocation']);
+
+    Route::get('request/packageLocation/{id}', [RequestsController::class, 'packageLocation']);
+
+
     Route::post('testNotification/{id}', [RequestsController::class, 'testNotification']);
     Route::post('updateExpoPushToken', [UserApiController::class, 'updateExpoPushToken']);
 
