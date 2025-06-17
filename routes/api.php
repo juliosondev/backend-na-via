@@ -90,9 +90,4 @@ Route::group([
     Route::get('allGroups', [HomeController::class, 'allGroups']);
     Route::post('addProduto', [ProdutoController::class, 'addProduto']);
 
-
-
-
-
-
 });
