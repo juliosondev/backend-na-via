@@ -38,6 +38,25 @@ class RequestsController extends Controller
             'created_at' => now(),
             'updated_at' => now()
         ]);
+
+        
+        Notifications::createAndSendForAllMotoboys([
+            'title' => 'Novo Pedido!!!',
+            'message' => 'Tem novo pedido no aplicativo. Vá rapidamente ver os detalhes e ver se aceitas!',
+            'data' => ['extraData' => 'Some extra data here'],
+            'type' => 'aceite',
+            'user_id' => null,
+            'expo_push_token' => null,
+        ]);
+        Notifications::createAndSendForAllMotoboys([
+            'title' => 'Novo Pedido!!!',
+            'message' => 'Tem novo pedido no aplicativo. Vá rapidamente ver os detalhes e ver se aceitas!',
+            'data' => ['extraData' => 'Some extra data here'],
+            'type' => 'aceite',
+            'user_id' => null,
+            'expo_push_token' => null,
+        ]);
+
     }
 
     public function myRequests($id)

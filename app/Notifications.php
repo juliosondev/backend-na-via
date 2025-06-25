@@ -120,6 +120,56 @@ public static function createAndSendForAllUnlogged(array $attributes)
     return [$notification];
 }
 
+public static function createAndSendForAllMotoboys(array $attributes)
+{
+    $users = User::whereNotNull('id')
+                 ->where('level', '==', 4)
+                 ->get();
+
+    $recipientTokens = $users->pluck('expo_push_token')->filter()->toArray();
+
+    if (empty($recipientTokens)) {
+        return [];
+    }
+
+    $channelName = 'group_unlogged_users_' . uniqid();
+
+    $expo = Expo::normalSetup();
+
+    foreach ($recipientTokens as $token) {
+        $expo->subscribe($channelName, $token);
+    }
+
+    $notification = self::create([
+        'title' => $attributes['title'],
+        'message' => $attributes['message'],
+        'data' => null,
+        'type' => $attributes['type'] ?? null,
+        'status' => 'activo',
+        'user_id' => 1,
+        'expo_push_token' => null,
+        // 'channel_name' => $channelName, 
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    $notificationData = [
+        'title' => $attributes['title'],
+        'body' => $attributes['message'],
+        'sound' => 'default',
+        'data' => $attributes['data'] ?? ['extraData' => 'Default data']
+    ];
+
+    $expo->notify([$channelName], $notificationData);
+
+    $notification->update([
+        'status' => 'sent',
+        'sent_at' => now(),
+    ]);
+
+    return [$notification];
+}
+
 
 
 }
