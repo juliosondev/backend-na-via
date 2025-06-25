@@ -516,6 +516,7 @@ class ComposerStaticInit2595b4461b2c1569693ed3e1be15ceca
         'App\\Modelos\\Clientes' => __DIR__ . '/../..' . '/app/Modelos/Clientes.php',
         'App\\Modelos\\Contacto' => __DIR__ . '/../..' . '/app/Modelos/Contacto.php',
         'App\\Modelos\\Product' => __DIR__ . '/../..' . '/app/Modelos/Product.php',
+        'App\\Notifications' => __DIR__ . '/../..' . '/app/Notifications.php',
         'App\\Pedido' => __DIR__ . '/../..' . '/app/Pedido.php',
         'App\\Product' => __DIR__ . '/../..' . '/app/Product.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',

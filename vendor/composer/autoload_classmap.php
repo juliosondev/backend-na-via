@@ -31,6 +31,7 @@ return array(
     'App\\Modelos\\Clientes' => $baseDir . '/app/Modelos/Clientes.php',
     'App\\Modelos\\Contacto' => $baseDir . '/app/Modelos/Contacto.php',
     'App\\Modelos\\Product' => $baseDir . '/app/Modelos/Product.php',
+    'App\\Notifications' => $baseDir . '/app/Notifications.php',
     'App\\Pedido' => $baseDir . '/app/Pedido.php',
     'App\\Product' => $baseDir . '/app/Product.php',
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',

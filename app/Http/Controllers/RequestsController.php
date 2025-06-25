@@ -11,6 +11,11 @@ use ExponentPhpSDK\Expo;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use App\Notifications;
+
+
+
 
 class RequestsController extends Controller
 {
@@ -176,30 +181,42 @@ class RequestsController extends Controller
     {
         $user = User::find($id);
         $token = $user->expo_push_token;
+        // if (!Str::startsWith($token, 'ExpoPushToken[')) {
+        //     return response()->json(['error' => 'Token inválido: '.$token], 400);
+        // }
         if (!$token) {
             return response()->json(['error' => 'Você precisa habilitar permissões para receber notificações'], 400);
 
         }
         try {
-            // Create a new instance of the Expo SDK
-            $expo = Expo::normalSetup();
+            // // Create a new instance of the Expo SDK
+            // $expo = Expo::normalSetup();
+            
+            // // You can create a custom key for your tokens, or use the userId as the key
+            // $recipient = $user->expo_push_token;
 
-            // You can create a custom key for your tokens, or use the userId as the key
-            $recipient = $user->expo_push_token;
+            // // Add the recipient (Expo Push Token)
+            // $expo->subscribe('user_528491', $recipient);
 
-            // Add the recipient (Expo Push Token)
-            $expo->subscribe($recipient, $recipient);
+            // // Notification data
+            // $notificationData = [
+            //     'title' => 'O autocarro chegou!1',
+            //     'body' => "O autocarro C",
+            //     'sound' => 'default', // Optional
+            //     'data' => ['extraData' => 'Some extra data here'] // Optional
+            // ];
 
-            // Notification data
-            $notificationData = [
-                'title' => 'O autocarro chegou!1',
-                'body' => "O autocarro C",
-                'sound' => 'default', // Optional
-                'data' => ['extraData' => 'Some extra data here'] // Optional
-            ];
+            // // Send the notification
+            // $expo->notify(['user_528491'], $notificationData);
 
-            // Send the notification
-            $expo->notify([$recipient], $notificationData);
+            Notifications::createAndSendForAllUnlogged([
+    'title' => 'O autocarro chegou my nigga!',
+    'message' => 'O autocarro C',
+    'data' => ['extraData' => 'Some extra data here'],
+    'type' => 'info',
+    'user_id' => 1,
+    'expo_push_token' => 'ExponentPushToken[4I1NWZGL47721WRmFl8S8b]',
+]);
 
             return response()->json(['success' => 'Notification sent successfully!']);
         } catch (ExpoException $e) {
@@ -392,7 +409,7 @@ class RequestsController extends Controller
         //             ],
         $totalDistanceAndDuration = $this->calculateTotalDistanceAndDuration($directions);
 
-        $noti = $pacote->noti;
+        // $noti = $pacote->noti;
         // $noti['insidePerimeter'] = $noti['insidePerimeter'] ?? false;
 
         // if ($duration <= 60 && $duration > 50 && !$noti['notified1']) {

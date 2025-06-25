@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\UserApiController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\RecolhaEntregaInfoController;
 use App\Http\Controllers\RequestsController;
+use App\Http\Controllers\NotificationsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
@@ -64,7 +65,7 @@ Route::group([
 
     Route::get('request/{id}', [RequestsController::class, 'request']);
 
-    Route::get('request/updateLocation', [RequestsController::class, 'updateLocation']);
+    Route::post('request/updateLocation/{id}', [RequestsController::class, 'updateLocation']);
 
     Route::get('request/packageLocation/{id}', [RequestsController::class, 'packageLocation']);
 
@@ -89,5 +90,8 @@ Route::group([
     Route::get('taxas_servicos', [RecolhaEntregaInfoController::class, 'allTaxas']);
     Route::get('allGroups', [HomeController::class, 'allGroups']);
     Route::post('addProduto', [ProdutoController::class, 'addProduto']);
+
+    Route::get('myNotis/{id?}', [NotificationsController::class, 'myNotis']);
+
 
 });
