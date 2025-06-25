@@ -168,10 +168,49 @@ class RequestsController extends Controller
         } else if ($field == 'accept') {
             $pedido->info = $request->input('info');
             $pedido->save();
+            
+            $user = User::find($request->noti['user_id']);
+
+            if (isset($user->expo_push_token)){
+                Notifications::createAndSend([
+                    'title' => $request->noti['title'],
+                    'message' => $request->noti['message'],
+                    'data' => ['extraData' => 'Some extra data here'],
+                    'type' => 'aceite',
+                    'user_id' => $request->noti['user_id'],
+                    'expo_push_token' => $user->expo_push_token,
+                ]);
+            }
             return response()->json($request->all());
         } else if ($field == 'stats') {
             $pedido->info = $request->input('info');
             $pedido->save();
+
+            $user = User::find($request->noti['user_id']);
+
+            if (isset($user->expo_push_token)){
+                Notifications::createAndSend([
+                    'title' => $request->noti['title'],
+                    'message' => $request->noti['message'],
+                    'data' => ['extraData' => 'Some extra data here'],
+                    'type' => 'aceite',
+                    'user_id' => $request->noti['user_id'],
+                    'expo_push_token' => $user->expo_push_token,
+                ]);
+
+
+                if (isset($request->noti1)){
+                    Notifications::createAndSend([
+                    'title' => $request->noti1['title'],
+                    'message' => $request->noti1['message'],
+                    'data' => ['extraData' => 'Some extra data here'],
+                    'type' => 'aceite',
+                    'user_id' => $request->noti1['user_id'],
+                    'expo_push_token' => $user->expo_push_token,
+                ]);
+                }
+            }
+
             return response()->json($pedido);
         }
     }
