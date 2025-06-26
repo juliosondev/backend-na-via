@@ -500,6 +500,7 @@ class ComposerStaticInit2595b4461b2c1569693ed3e1be15ceca
         'App\\Http\\Controllers\\Api\\HomeController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/HomeController.php',
         'App\\Http\\Controllers\\Api\\UserApiController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/UserApiController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+        'App\\Http\\Controllers\\NotificationsController' => __DIR__ . '/../..' . '/app/Http/Controllers/NotificationsController.php',
         'App\\Http\\Controllers\\ProdutoController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProdutoController.php',
         'App\\Http\\Controllers\\RecolhaEntregaInfoController' => __DIR__ . '/../..' . '/app/Http/Controllers/RecolhaEntregaInfoController.php',
         'App\\Http\\Controllers\\RequestsController' => __DIR__ . '/../..' . '/app/Http/Controllers/RequestsController.php',

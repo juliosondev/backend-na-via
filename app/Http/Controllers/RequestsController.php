@@ -281,6 +281,20 @@ class RequestsController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+
+    public function sendAllUnlogged(Request $request){
+        Notifications::createAndSendForAllUnlogged([
+            'title' => $request->title,
+            'message' => $request->message,
+            'data' => ['extraData' => 'Some extra data here'],
+            'type' => 'info',
+            'user_id' => null,
+            'expo_push_token' => null,
+        ]);
+
+        return response()->json(['success' => 'Notification sent successfully!']);
+    }
     public function addProductReview(Request $request)
     {
         $req = DB::table('comentarios_produtos')->insert([
@@ -292,7 +306,24 @@ class RequestsController extends Controller
             'created_at' => now(),
             'updated_at' => now()
         ]);
-        return response()->json($req);
+
+        $user = User::find($request->noti['user_id']);
+
+        if (isset($user->expo_push_token)){
+            Notifications::createAndSend([
+                'title' => $request->noti['title'],
+                'message' => $request->noti['message'],
+                'data' => ['extraData' => 'Some extra data here'],
+                'type' => 'aceite',
+                'user_id' => $request->noti['user_id'],
+                'expo_push_token' => $user->expo_push_token,
+            ]);
+        }
+
+        $comments = ComentarioProduto::where('user_id', $request->input('user_id'))
+            ->get();
+
+        return response()->json($comments);
     }
     public function myReviews(Request $request, $id)
     {

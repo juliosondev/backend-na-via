@@ -589,13 +589,40 @@ class UserApiController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function updateExpoPushToken(Request $request){
+    public function updateExpoPushToken(Request $request)
+{
+    $token = $request->token;
+
+    if ($request->has('id') && User::find($request->id)) {
         $user = User::find($request->id);
-        $user->expo_push_token = $request->token;
+        $user->expo_push_token = $token; 
+        $user->save();
+        return response()->json($user);
+    } else {
+        $user = User::find(1);
+        if (!$user) {
+            return response()->json(['error' => 'User with ID 1 not found'], 404);
+        }
+
+        $tokens = [];
+
+        if ($user->expo_push_tokens) {
+            $tokens = json_decode($user->expo_push_tokens, true);
+            if (!is_array($tokens)) {
+                $tokens = [];
+            }
+        }
+
+        if (!in_array($token, $tokens)) {
+            $tokens[] = $token;
+        }
+
+        $user->expo_push_tokens = json_encode($tokens);
         $user->save();
 
         return response()->json($user);
     }
+}
 
     public function destroy($id)
     {

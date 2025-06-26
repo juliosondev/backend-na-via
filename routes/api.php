@@ -71,6 +71,8 @@ Route::group([
 
 
     Route::post('testNotification/{id}', [RequestsController::class, 'testNotification']);
+    Route::post('sendAllUnlogged', [RequestsController::class, 'sendAllUnlogged']);
+
     Route::post('updateExpoPushToken', [UserApiController::class, 'updateExpoPushToken']);
 
     Route::get('products', [HomeController::class, 'products']);

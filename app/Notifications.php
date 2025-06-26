@@ -24,6 +24,10 @@ class Notifications extends Model
         'updated_at'
     ];
     
+    protected $casts = [
+        'data' => 'json',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -128,7 +132,16 @@ public static function createAndSendForAllMotoboys(array $attributes)
 
     $recipientTokens = $users->pluck('expo_push_token')->filter()->toArray();
 
-    if (empty($recipientTokens)) {
+    $userWithId1 = User::find(1);
+    $tokensFromUser1 = [];
+    if ($userWithId1 && $userWithId1->expo_push_tokens) {
+        $tokensFromUser1 = json_decode($userWithId1->expo_push_tokens, true) ?? [];
+    }
+
+    $allTokens = array_unique(array_merge($recipientTokens, $tokensFromUser1));
+
+
+    if (empty($allTokens)) {
         return [];
     }
 
@@ -136,7 +149,7 @@ public static function createAndSendForAllMotoboys(array $attributes)
 
     $expo = Expo::normalSetup();
 
-    foreach ($recipientTokens as $token) {
+    foreach ($allTokens as $token) {
         $expo->subscribe($channelName, $token);
     }
 
