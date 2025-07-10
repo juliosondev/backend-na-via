@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\ComentarioProduto;
+use App\Events\PackageLocationUpdate;
 use App\Http\Controllers\Controller;
 use App\Pedido;
 use App\User;
@@ -483,9 +484,14 @@ class RequestsController extends Controller
     }
     public function updateLocation(Request $request, $id)
     {
+
+        $customId = "{$id}";
+        
+
+
         $pacote = User::find($id);
         $directions = $request->localizacao['directions'];
-
+        $location = $request->localizacao;
         $distance = (float) $request->localizacao['distanceF'];
         $duration = (float) $request->localizacao['duration'];
         // 'noti' => [
@@ -496,8 +502,14 @@ class RequestsController extends Controller
         //                 'notified10' => false,
         //                 'notifiedNow' => false,
         //             ],
-        $totalDistanceAndDuration = $this->calculateTotalDistanceAndDuration($directions);
 
+        DB::table('package_locations')->updateOrInsert(
+            ['custom_id' => $customId],
+            ['location' => json_encode($location), 'updated_at' => now()]
+        );
+        broadcast(new PackageLocationUpdate($customId, $location))->toOthers();
+        $totalDistanceAndDuration = $this->calculateTotalDistanceAndDuration($directions);
+        
         // $noti = $pacote->noti;
         // $noti['insidePerimeter'] = $noti['insidePerimeter'] ?? false;
 
@@ -562,7 +574,7 @@ class RequestsController extends Controller
 
 
         // $pacote->noti = $noti;
-
+        
         $pacote->localizacao = $request->localizacao;
 
         $pacote->save();

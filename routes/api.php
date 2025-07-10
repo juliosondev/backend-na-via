@@ -9,7 +9,7 @@ use App\Http\Controllers\NotificationsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Facades\Socialite;
-
+use App\Events\TestMessageSentWS;
 
 
 
@@ -95,5 +95,19 @@ Route::group([
 
     Route::get('myNotis/{id?}', [NotificationsController::class, 'myNotis']);
 
+
+
+    Route::get('/test', function () {
+    event(new TestMessageSentWS('Hello from backend!'));
+        return 'Message sent!';
+    });
+
+    Route::post('/testSend', function (\Illuminate\Http\Request $request) {
+        $message = $request->input('message');
+
+        broadcast(new TestMessageSentWS($message))->toOthers();
+
+        return response()->json(['status' => 'Message sent']);
+    });
 
 });

@@ -335,8 +335,6 @@ class UserApiController extends Controller
            $user->save();
 
 
-
-
            return view('emails.verified3', ['user' => $user1]);
            return response()->json('Email enviado');
 
