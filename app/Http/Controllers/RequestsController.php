@@ -40,24 +40,23 @@ class RequestsController extends Controller
             'updated_at' => now()
         ]);
 
-        
-        Notifications::createAndSendForAllMotoboys([
-            'title' => 'Novo Pedido!!!',
-            'message' => 'Tem novo pedido no aplicativo. Vá rapidamente ver os detalhes e ver se aceitas!',
-            'data' => ['extraData' => 'Some extra data here'],
-            'type' => 'aceite',
-            'user_id' => null,
-            'expo_push_token' => null,
-        ]);
-        Notifications::createAndSendForAllMotoboys([
-            'title' => 'Novo Pedido!!!',
-            'message' => 'Tem novo pedido no aplicativo. Vá rapidamente ver os detalhes e ver se aceitas!',
-            'data' => ['extraData' => 'Some extra data here'],
-            'type' => 'aceite',
-            'user_id' => null,
-            'expo_push_token' => null,
-        ]);
 
+        Notifications::createAndSendForAllMotoboys([
+            'title' => 'Novo Pedido!!!',
+            'message' => 'Tem novo pedido no aplicativo. Vá rapidamente ver os detalhes e ver se aceitas!',
+            'data' => ['extraData' => 'Some extra data here'],
+            'type' => 'aceite',
+            'user_id' => null,
+            'expo_push_token' => null,
+        ]);
+        Notifications::createAndSendForAllMotoboys([
+            'title' => 'Novo Pedido!!!',
+            'message' => 'Tem novo pedido no aplicativo. Vá rapidamente ver os detalhes e ver se aceitas!',
+            'data' => ['extraData' => 'Some extra data here'],
+            'type' => 'aceite',
+            'user_id' => null,
+            'expo_push_token' => null,
+        ]);
     }
 
     public function myRequests($id)
@@ -108,7 +107,6 @@ class RequestsController extends Controller
             return $pedido;
         });
         return response()->json($pedidos);
-
     }
     public function availableRequests()
     {
@@ -188,10 +186,15 @@ class RequestsController extends Controller
         } else if ($field == 'accept') {
             $pedido->info = $request->input('info');
             $pedido->save();
-            
-            $user = User::find($request->noti['user_id']);
 
-            if (isset($user->expo_push_token)){
+            $user = User::find($request->noti['user_id']);
+            DB::table('package_locations')->insert([
+                'custom_id' => "{$request->motoBoy['user_id']}",
+                'location' => null,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+            if (isset($user->expo_push_token)) {
                 Notifications::createAndSend([
                     'title' => $request->noti['title'],
                     'message' => $request->noti['message'],
@@ -208,7 +211,7 @@ class RequestsController extends Controller
 
             $user = User::find($request->noti['user_id']);
 
-            if (isset($user->expo_push_token)){
+            if (isset($user->expo_push_token)) {
                 Notifications::createAndSend([
                     'title' => $request->noti['title'],
                     'message' => $request->noti['message'],
@@ -219,15 +222,15 @@ class RequestsController extends Controller
                 ]);
 
 
-                if (isset($request->noti1)){
+                if (isset($request->noti1)) {
                     Notifications::createAndSend([
-                    'title' => $request->noti1['title'],
-                    'message' => $request->noti1['message'],
-                    'data' => ['extraData' => 'Some extra data here'],
-                    'type' => 'aceite',
-                    'user_id' => $request->noti1['user_id'],
-                    'expo_push_token' => $user->expo_push_token,
-                ]);
+                        'title' => $request->noti1['title'],
+                        'message' => $request->noti1['message'],
+                        'data' => ['extraData' => 'Some extra data here'],
+                        'type' => 'aceite',
+                        'user_id' => $request->noti1['user_id'],
+                        'expo_push_token' => $user->expo_push_token,
+                    ]);
                 }
             }
 
@@ -245,12 +248,11 @@ class RequestsController extends Controller
         // }
         if (!$token) {
             return response()->json(['error' => 'Você precisa habilitar permissões para receber notificações'], 400);
-
         }
         try {
             // // Create a new instance of the Expo SDK
             // $expo = Expo::normalSetup();
-            
+
             // // You can create a custom key for your tokens, or use the userId as the key
             // $recipient = $user->expo_push_token;
 
@@ -269,13 +271,13 @@ class RequestsController extends Controller
             // $expo->notify(['user_528491'], $notificationData);
 
             Notifications::createAndSendForAllUnlogged([
-    'title' => 'O autocarro chegou my nigga!',
-    'message' => 'O autocarro C',
-    'data' => ['extraData' => 'Some extra data here'],
-    'type' => 'info',
-    'user_id' => 1,
-    'expo_push_token' => 'ExponentPushToken[4I1NWZGL47721WRmFl8S8b]',
-]);
+                'title' => 'O autocarro chegou my nigga!',
+                'message' => 'O autocarro C',
+                'data' => ['extraData' => 'Some extra data here'],
+                'type' => 'info',
+                'user_id' => 1,
+                'expo_push_token' => 'ExponentPushToken[4I1NWZGL47721WRmFl8S8b]',
+            ]);
 
             return response()->json(['success' => 'Notification sent successfully!']);
         } catch (ExpoException $e) {
@@ -284,7 +286,8 @@ class RequestsController extends Controller
     }
 
 
-    public function sendAllUnlogged(Request $request){
+    public function sendAllUnlogged(Request $request)
+    {
         Notifications::createAndSendForAllUnlogged([
             'title' => $request->title,
             'message' => $request->message,
@@ -310,7 +313,7 @@ class RequestsController extends Controller
 
         $user = User::find($request->noti['user_id']);
 
-        if (isset($user->expo_push_token)){
+        if (isset($user->expo_push_token)) {
             Notifications::createAndSend([
                 'title' => $request->noti['title'],
                 'message' => $request->noti['message'],
@@ -456,7 +459,6 @@ class RequestsController extends Controller
             });
             $item->info = json_encode(['cart' => $filteredCart->values()->all(), 'delivered' => json_decode($item->info, true)['delivered'], 'user' => $clientInfo]);
             return $item;
-
         });
         return response()->json([
             'ratings' => $ratings,
@@ -474,7 +476,6 @@ class RequestsController extends Controller
             ->get();
 
         return response()->json($produtos);
-
     }
 
     public function packageLocation($id)
@@ -486,96 +487,35 @@ class RequestsController extends Controller
     {
 
         $customId = "{$id}";
-        
+
 
 
         $pacote = User::find($id);
-        $directions = $request->localizacao['directions'];
-        $location = $request->localizacao;
-        $distance = (float) $request->localizacao['distanceF'];
-        $duration = (float) $request->localizacao['duration'];
-        // 'noti' => [
-        //                 'notified1' => false,
-        //                 'notified45' => false,
-        //                 'notified30' => false,
-        //                 'notified15' => false,
-        //                 'notified10' => false,
-        //                 'notifiedNow' => false,
-        //             ],
 
+
+
+        $newLocation = $request->localizacao;
+        if ($request->has('only')) {
+            //get the already existing localizacao with calculated eta and everything and just change the coords that are coming from the front
+
+            //i want you (AI) to calculate the distanceF (how far it is from arrival) and duration (eta) and add it to the $newLocation['distanceF'] and $newLocation['duration']
+            $existingLocation = json_decode($pacote->localizacao, true);
+
+            $newLocationData = $request->localizacao;
+
+            $newLocation = array_merge($existingLocation ?? [], (array)$newLocationData);
+        } else {
+            $directions = $request->localizacao['directions'];
+            $location = $request->localizacao;
+            $distance = (float) $request->localizacao['distanceF'];
+            $duration = (float) $request->localizacao['duration'];
+        }
+        broadcast(new PackageLocationUpdate($customId, $newLocation))->toOthers();
         DB::table('package_locations')->updateOrInsert(
             ['custom_id' => $customId],
-            ['location' => json_encode($location), 'updated_at' => now()]
+            ['location' => json_encode($newLocation), 'updated_at' => now()]
         );
-        broadcast(new PackageLocationUpdate($customId, $location))->toOthers();
-        $totalDistanceAndDuration = $this->calculateTotalDistanceAndDuration($directions);
-        
-        // $noti = $pacote->noti;
-        // $noti['insidePerimeter'] = $noti['insidePerimeter'] ?? false;
-
-        // if ($duration <= 60 && $duration > 50 && !$noti['notified1']) {
-        //     $direccao = $autocarro->direccao == 0 ? $autocarro->rota->partida : $autocarro->rota->chegada;
-        //     $body = "O autocarro C" . $autocarro->codigo . " está a sensivelmente 1 hora de: " . $direccao;
-        //     $noti['notified1'] = true;
-
-        //     try {
-        //         $this->sendSms05($autocarro, $body);
-        //         // $this->sendSms25($autocarro, $body);
-        //     } catch (\Exception $e) {
-        //         Log::error("Failed to send SMS for bus " . $autocarro->codigo . ": " . $e->getMessage());
-        //         $noti['notified1'] = true; // Reset flag if SMS fails
-        //     }
-        // }
-
-        // if ($duration <= 30 && $duration > 25 && !$noti['notified30']) {
-        //     $direccao = $autocarro->direccao == 0 ? $autocarro->rota->partida : $autocarro->rota->chegada;
-        //     $body = "O autocarro C" . $autocarro->codigo . " está a sensivelmente 30 minutos de: " . $direccao;
-
-
-        //     $noti['notified30'] = true;
-        //     try {
-        //         $this->sendSms05($autocarro, $body);
-        //         // $this->sendSms25($autocarro, $body);
-        //     } catch (\Exception $e) {
-        //         $noti['notified30'] = true; // Reset flag if SMS fails
-        //     }
-        // }
-
-        // if ($duration <= 15 && $duration > 10 && !$noti['notified15']) {
-        //     $direccao = $autocarro->direccao == 0 ? $autocarro->rota->partida : $autocarro->rota->chegada;
-        //     $body = "O autocarro C" . $autocarro->codigo . " está a sensivelmente 15 minutos de: " . $direccao;
-
-
-        //     $noti['notified15'] = true;
-        //     try {
-        //         $this->sendSms05($autocarro, $body);
-        //         // $this->sendSms25($autocarro, $body);
-        //     } catch (\Exception $e) {
-        //         $noti['notified15'] = true; // Reset flag if SMS fails
-        //     }
-        // }
-
-        // if ($distance <= 0.010 && !$noti['insidePerimeter']) {
-        //     $noti['insidePerimeter'] = true;
-        //     $noti['notified30'] = false;
-        //     $noti['notified15'] = false;
-        //     $noti['notified1'] = false;
-        //     $this->sendSms($autocarro);
-        //     // $this->sendSms1($autocarro);
-        // } else if (($distance > 0.010) && ($noti['notifiedNow'] == false && $autocarro->direccao == 0) && $noti['insidePerimeter']) {
-        //     $noti['insidePerimeter'] = false;
-        //     $noti['notifiedNow'] = true;
-        //     $autocarro->direccao = 1;
-        // } else if (($distance > 0.010) && ($noti['notifiedNow'] == true && $autocarro->direccao == 1) && $noti['insidePerimeter']) {
-        //     $noti['insidePerimeter'] = false;
-        //     $noti['notifiedNow'] = false;
-        //     $autocarro->direccao = 0;
-        // }
-
-
-        // $pacote->noti = $noti;
-        
-        $pacote->localizacao = $request->localizacao;
+        $pacote->localizacao = $newLocation;
 
         $pacote->save();
 
@@ -599,5 +539,4 @@ class RequestsController extends Controller
             'duration' => $totalDuration
         ];
     }
-
 }
